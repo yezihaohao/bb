@@ -99,6 +99,12 @@ this.setState({ data: {...data, key: 1 } });
 ```js
 this.setState(({ data }) => ({ data: {...data, key: 1 } }));
 ```
+还可以：
+```js
+this.setState((state, props) => {
+    return { counter: state.counter + props.step };
+});
+```
 ##### 第六道菜：水煮肉片
 React 性能优化有很多种方式，那常见的一种就是在生命周期函数shouldComponentUpdate里面判断某些值或属性来控制组件是否重新再次渲染。
 
@@ -113,22 +119,171 @@ shouldComponentUpdate(nextProps, nextState) {
 ```
 
 ##### 第七道菜：干锅兔
+创建弹层的三种方式：
+1. 普通组件通过state和样式控制，在当前组件中显示弹层-每次引入组件并且render里面控制显示，挂载节点在某组件里面
+```js
+// 弹层 
+const Dialog = () => <div>弹层</div>
+// 某组件
+render() {
+    return (
+        this.state.showDialog && <Dialog />
+    )
+}
+```
+2.通过Portals创建通道，在根节点外部挂载组件-但还是需要每次引入并且在render里面调用
+```js
+// 弹层 
+class Dialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.el = document.createElement('div');
+  }
+  componentDidMount() {
+    modalRoot.appendChild(this.el);
+  }
+  componentWillUnmount() {
+    modalRoot.removeChild(this.el);
+  }
+
+  render() {
+    return ReactDOM.createPortal(
+      this.props.children || <div>xxxx</div>,
+      this.el,
+    );
+  }
+}
+// 某组件
+render() {
+    return (
+        this.state.showDialog && <Dialog />
+    )
+}
+
+```
+3.推荐使用ReactDom.render创建弹层-挂载根节点外层，使用也更方便
+```js
+// demo
+let dialog;
+class Dialog {
+    show(children) {    // 显示
+        this.div = document.createElement('div');
+        document.body.appendChild(this.div);
+
+        ReactDom.render(children || <div>xxxx</div>, this.div);
+    }
+    destroy() {     // 销毁
+        ReactDom.unmountComponentAtNode(this.div);
+        this.div.parentNode.removeChild(this.div);
+    }
+}
+export default {
+    show: function(children) {
+        dialog = new Dialog();
+        dialog.show(children);
+    },
+    hide: xxxxx
+};
+// 某组件
+import Dialog from 'xxx';
+alert = () => {
+    Dialog.show(xxxx);
+}
+render() {
+    return (
+        <button onClick={this.alert}>点击弹层</button>
+    )
+}
+```
 
 ##### 第八道菜：火烧肉
 
-render props是现在很流行的一种渲染方式，通过回调函数，渲染子组件，参数可为父组件的任意属性值（[官网也有相应的介绍](https://reactjs.org/docs/render-props.html)）
+render props是现在很流行的一种渲染方式，通过回调函数，渲染子组件，参数可为父组件的任意属性值（[官网也有相应的介绍](https://reactjs.org/docs/render-props.html)）新版的contextApi也采用了这个模式。
 
-很多种使用此方式的做法：
+很多种场景使用此方式的做法：
+```js
+// 权限控制组件，只需要封装一次connect，
+// 通过render props向子组件传递权限
+class AuthWidget extends Component {
+    render() {
+        return this.props.children(this.props.auth);
+    }
+}
 
+const mapStateToProps = state => {
+    const { auth } = state;
+    return { auth: state.auth };
+};
+export default connect(mapStateToProps)(AuthWidget);
+
+// 其他组件使用
+<AuthWidget
+    children={auth => auth.edit && <a>编辑</a>}
+/>
+
+// 使用antd的form时
+const Test = ({ form, children }) => {
+    return children(form);
+};
+const FormTest = Form.create()(Test);
+
+class Demo extends Component {
+    render() {
+        return (
+            <div>
+                xxxxx
+                <FormTest>
+                    { form => {
+                        this.form = form;
+                        return (
+                            <Form>
+                                <Form.Item>
+                                    {getFieldDecorator('field', xxx)(
+                                        <Input placeholder="请输入链接地址" />
+                                    )}
+                                </Form.Item>
+                            </Form>
+                        )
+                    }}
+                </FormTest>
+            </div>
+        )
+    }
+}
+```
 
 ##### 第九道菜：粉丝白菜虾仁汤 
+子组件改变父组件的state方式有很多种，可以在父组件设置一个通用函数，类似：setParentState，通过子组件回调处理时，就可以更方便的统一处理：
+```js
+// 父组件
+state = {
+    data: {}
+}
+setParentState = obj => {
+    this.setState(obj);
+}
+// 子组件
+onClick = () => {
+    this.props.setParentState({ data: xxx });
+}
+```
 
 ##### 第十道菜：麻婆豆腐
+永远不要直接设置state的值：this.state.data = { a: 1 }。这个会导致几个问题：
+1：组件不会重新渲染  2：shouldComponentUpdate(nextProps, nextState) 函数里面 this.state的值是已经改变了,和nextState的值相同。
 
-创建弹层的三种方式, ReactDom的其他用法
+举个栗子：
+```
+// wrong
+const { data } = this.state;
+data.a = 1;     // 等价于this.state.data.a = 1;
+this.setState({ data }); // shouldComponentUpdate里面观察到 this.state 和nextState的值是相同的
+// 此时函数里面性能相关的优化是无效的
 
-function props render children方式  props => <div>{props.something}</div>
+// correct  需要用到当前state值的写法
+this.setState(state => ({ data: {...state.data, a: 1} }))
+```
 
-setParentState 
+> 各位客官，菜已上齐，请慢用
 
-尽量新生成对象设置state，不然shouldcomponentupdate prevstate获取到的是已经改变的对象
+> react相关讨论，请加Q群：743490497
