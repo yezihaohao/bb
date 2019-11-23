@@ -12,7 +12,8 @@
 #### 移动端开发
 
 [H5手机端开发问题汇总及解决方案](https://github.com/yezihaohao/blog/blob/master/H5%E6%89%8B%E6%9C%BA%E7%AB%AF%E5%BC%80%E5%8F%91%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.md)
-[移动端H5音频自动播放的解决方案]https://github.com/yezihaohao/blog/blob/master/%E7%A7%BB%E5%8A%A8%E7%AB%AFH5%E9%9F%B3%E9%A2%91%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.md
+
+[移动端H5音频自动播放的解决方案](https://github.com/yezihaohao/blog/blob/master/%E7%A7%BB%E5%8A%A8%E7%AB%AFH5%E9%9F%B3%E9%A2%91%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.md)
 
 #### 团队开发
 
