@@ -19,6 +19,10 @@
 
 [前端开发团队的工具链](https://github.com/yezihaohao/blog/blob/master/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91%E5%9B%A2%E9%98%9F%E7%9A%84%E5%B7%A5%E5%85%B7%E9%93%BE.md)
 
+#### 系统学习
+
+[图说JavaScript](https://github.com/yezihaohao/didact-javascript)
+
 > QQ交流群：
 - 1群：264591039（已满）
 - 2群：592688854（已满）
